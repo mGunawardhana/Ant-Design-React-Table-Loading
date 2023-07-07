@@ -258,8 +258,8 @@ function App() {
             <Row gutter={[16, 16]} justify="center">
               <Col xs={24} sm={12} md={8}>
                 <Form.Item
-                  name="code"
-                  label="Code"
+                  name="customerName"
+                  label="Customer Name"
                   rules={[
                     {
                       required: true,
@@ -273,23 +273,24 @@ function App() {
                   <Input placeholder="Type your name" />
                 </Form.Item>
               </Col>
-                          <Col xs={24} sm={12} md={8}>
-                              {/* <label>MAneesha</label> */}
-                <Form.Item
-                //   label="Company Name:"
-                  name="companyName"
-                  rules={[
-                    {
-                      required: true,
-                      //   message: "Please enter your name",
-                    },
-                    { whitespace: true },
-                    { min: 3 },
-                  ]}
-                  hasFeedback
-                >
-                  <Input placeholder="Reference Number" />
-                </Form.Item>
+              <Col xs={24} sm={12} md={8}
+              >
+                  <Form.Item
+                       label="Company Name:"
+                    name="companyName"
+                    rules={[
+                      {
+                        required: true,
+                        //   message: "Please enter your name",
+                      },
+                      { whitespace: true },
+                      { min: 3 },
+                    ]}
+                    hasFeedback
+                  >
+                    <Input placeholder="Reference Number" />
+                  </Form.Item>
+               
               </Col>
               <Col xs={24} sm={12} md={8}>
                 <Form.Item
