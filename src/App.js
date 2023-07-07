@@ -1,14 +1,14 @@
 import "./App.css";
 import {
-  Button,
+  Image,
+  Col,
   Divider,
+  Form,
   Input,
   Modal,
-  Form,
-  Table,
   Row,
-  Col,
   Select,
+  Table,
 } from "antd";
 import { useState } from "react";
 import {
@@ -16,11 +16,12 @@ import {
   EditOutlined,
   EyeOutlined,
   PlusCircleFilled,
-  VerticalAlignBottomOutlined,
   SearchOutlined,
+  VerticalAlignBottomOutlined,
 } from "@ant-design/icons";
 
 function App() {
+  const [form] = Form.useForm();
   const [isEditing, setIsEditing] = useState(false);
   const [editingStudent, setEditingStudent] = useState(null);
   const [dataSource, setDataSource] = useState([
@@ -170,14 +171,12 @@ function App() {
           title="CUSTOMER DETAILS"
           visible={isEditing}
           okText="Save"
-          onCancel={() => {
-            resetEditing();
-          }}
+          onCancel={resetEditing}
           width={1200}
-          hight={1000}
+          height={800}
           onOk={() => {
-            setDataSource((pre) => {
-              return pre.map((student) => {
+            setDataSource((prev) => {
+              return prev.map((student) => {
                 if (student.id === editingStudent.id) {
                   return editingStudent;
                 } else {
@@ -190,60 +189,70 @@ function App() {
         >
           <Divider />
           <Form
+            form={form}
+            name="validateOnly"
+            layout="vertical"
             autoComplete="off"
-            onFinish={(values) => {
-              console.log({ values });
-            }}
             onFinishFailed={(error) => {
               console.log({ error });
             }}
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
           >
-            <Row gutter={[16, 16]} justify="center">
-              <Col xs={24} sm={12} md={8}>
+            <Row
+              gutter={[16, 6]}
+              justify="center"
+              style={{ marginTop: -20}}
+            >
+              {" "}
+              <Col span={7}>
+                {/*<label>Code:*</label>*/}
                 <Form.Item
-                  name="code"
                   label="Code"
+                  name="code"
                   rules={[
                     {
                       required: true,
-                      //   message: "Please enter your name",
+                      message: "Please enter the code",
                     },
-                    { whitespace: true },
-                    { min: 3 },
+                    { whitespace: false },
                   ]}
                   hasFeedback
+                  labelAlign="top"
                 >
-                  <Input placeholder="Type your name" />
+                  <Input placeholder="Type the code" />
                 </Form.Item>
               </Col>
-              <Col xs={24} sm={12} md={8}>
+              <Col span={7}>
+                {/*<label>Reference Name</label>*/}
                 <Form.Item
+                  label="Reference Number"
                   name="reference_number"
-                  label="Reference No:"
                   rules={[
                     {
                       required: true,
-                      //   message: "Please enter your name",
+                      message: "Please enter the reference number",
                     },
-                    { whitespace: true },
-                    { min: 3 },
+                    { whitespace: false },
                   ]}
                   hasFeedback
                 >
                   <Input placeholder="Reference Number" />
                 </Form.Item>
               </Col>
-              <Col xs={24} sm={12} md={8}>
+              <Col span={7}>
+                {/*<label>Customer Type:*</label>*/}
                 <Form.Item
                   name="customer_type"
-                  label="Customer Type"
+                  label="Customer Name"
                   rules={[
                     {
                       required: true,
-                      // message: "Please enter your name",
+                      message: "Please select the customer type",
                     },
-                    { whitespace: true },
-                    { min: 3 },
                   ]}
                   hasFeedback
                 >
@@ -254,59 +263,55 @@ function App() {
                   </Select>
                 </Form.Item>
               </Col>
-            </Row>
-            <Row gutter={[16, 16]} justify="center">
-              <Col xs={24} sm={12} md={8}>
+              <Col span={7} style={{ marginTop: -20, marginBottom: -20 }}>
+                {/*<label>Customer Name: *</label>*/}
                 <Form.Item
                   name="customerName"
                   label="Customer Name"
                   rules={[
                     {
                       required: true,
-                      //   message: "Please enter your name",
+                      message: "Please enter the customer name",
                     },
-                    { whitespace: true },
-                    { min: 3 },
+                    { whitespace: false },
                   ]}
                   hasFeedback
                 >
-                  <Input placeholder="Type your name" />
+                  <Input placeholder="Type the customer name" />
                 </Form.Item>
               </Col>
-              <Col xs={24} sm={12} md={8}
-              >
-                  <Form.Item
-                       label="Company Name:"
-                    name="companyName"
-                    rules={[
-                      {
-                        required: true,
-                        //   message: "Please enter your name",
-                      },
-                      { whitespace: true },
-                      { min: 3 },
-                    ]}
-                    hasFeedback
-                  >
-                    <Input placeholder="Reference Number" />
-                  </Form.Item>
-               
-              </Col>
-              <Col xs={24} sm={12} md={8}>
+              <Col span={7} style={{ marginTop: -20, marginBottom: -20 }}>
+                {/*<label>Company Name</label>*/}
                 <Form.Item
-                  name="idType"
-                  label="NIC/Passport/Driver's Licence"
+                  name="companyName"
+                  label="Company Name"
                   rules={[
                     {
                       required: true,
-                      //   message: "Please enter your name",
+                      message: "Please enter the company name",
                     },
-                    { whitespace: true },
-                    { min: 3 },
+                    { whitespace: false },
                   ]}
                   hasFeedback
                 >
-                  <Input placeholder="Customer Type" />
+                  <Input placeholder="Company Name" />
+                </Form.Item>
+              </Col>
+              <Col span={7} style={{ marginTop: -20, marginBottom: -20 }}>
+                {/*<label>NIC/Passport/Driver's Licence: *</label>*/}
+                <Form.Item
+                  name="idType"
+                  label="ID Type"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please enter the ID type",
+                    },
+                    { whitespace: false },
+                  ]}
+                  hasFeedback
+                >
+                  <Input placeholder="ID Type" />
                 </Form.Item>
               </Col>
             </Row>
