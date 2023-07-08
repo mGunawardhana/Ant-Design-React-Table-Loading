@@ -21,7 +21,7 @@ USE `mydb`;
 CREATE TABLE IF NOT EXISTS `mydb`.`Customer`
 (
     `customer_id`     INT         NOT NULL,
-    `customer_code`   INT         NULL,
+    `customer_code`   VARCHAR(45)         NULL,
     `company_name`    VARCHAR(45) NULL,
     `reference_no`    VARCHAR(45) NULL,
     `customer_type`   VARCHAR(45) NULL,
