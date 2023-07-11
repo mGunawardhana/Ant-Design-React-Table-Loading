@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS `mydb`.`Customer`
 CREATE TABLE IF NOT EXISTS `mydb`.`document`
 (
     `document_id` INT         NOT NULL,
-    `document`    VARCHAR(45) NULL,
+    `document`    BLOB NULL,
     `Customer_id` INT         NOT NULL,
     PRIMARY KEY (`document_id`, `Customer_id`),
     INDEX `fk_document_Customer1_idx` (`Customer_id` ASC) VISIBLE,
