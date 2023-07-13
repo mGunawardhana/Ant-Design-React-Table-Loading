@@ -1,20 +1,7 @@
 import "./App.css";
-import React, {ChangeEvent, useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 
-import {
-    Image,
-    Col,
-    Divider,
-    Form,
-    Input,
-    Modal,
-    Row,
-    Select,
-    Table,
-    Upload,
-    Button,
-    Radio,
-} from "antd";
+import {Button, Col, Divider, Form, Image, Input, Modal, Radio, Row, Select, Table, Upload,} from "antd";
 import {
     DeleteOutlined,
     EditOutlined,
@@ -25,7 +12,6 @@ import {
 } from "@ant-design/icons";
 import axios from "./axios";
 import Swal from "sweetalert2";
-import $ from "jquery";
 
 const {TextArea} = Input;
 
@@ -34,60 +20,86 @@ function App() {
     const [isEditing, setIsEditing] = useState(false);
     const [editingStudent, setEditingStudent] = useState(null);
 
+
     const [customers, setCustomerList] = useState([]);
     const [types, setTypesList] = useState([]);
-    const [country, setCountryList] = useState([]);
+    const [countryArray, setCountryArrayList] = useState([]);
 
     //hooks for text fields
     const [customerId, setCustomerId] = useState(0);
-    const [customerCode, setCustomerCode] = useState("");
+    const [code, setCode] = useState("");
     const [companyName, setCompanyName] = useState("");
-    const [referenceNumber, setReferenceNumber] = useState("");
+    const [refNo, setRefNo] = useState("");
     const [customerType, setCustomerType] = useState("");
-    const [customerName, setCustomerName] = useState("");
-    const [passport, setPassport] = useState("");
+    const [name, setName] = useState("");
+    const [nicNo, setNicNo] = useState("");
     const [billingAddress, setBillinAddress] = useState("");
-    const [mobileNumber, setMobileNumber] = useState("");
+    const [mobile, setMobile] = useState("");
     const [email, setEmail] = useState("");
-    const [countryTxt, setCountry] = useState("");
+    const [country, setCountry] = useState([]);
     const [gender, setGender] = useState("");
     const [city, setCity] = useState("");
     const [id, setId] = useState("");
 
+    const [designation, setDesignation] = useState("");
+
     const [searchField, setSearchField] = useState("");
     const [searchValue, searchValueChange] = useState();
 
+    /** array for storing customer details */
+    // let customerDetails = [];
+    //
+    class ContactPersonDetail {
+        constructor(name, designation, mobile, email) {
+            this.name = name;
+            this.designation = designation;
+            this.mobile = mobile;
+            this.email = email;
+        }
+    }
+
+    const [customerDetails, setCustomerDetails] = useState([]);
+
+    const handleAddCustomer = () => {
+        let customer = new ContactPersonDetail(
+            name,
+            designation,
+            mobile,
+            email
+        );
+        setCustomerDetails([...customerDetails, customer]);
+    };
 
     const getAllCustomers = async () => {
         try {
-            const response = await axios.get("/load-all-customers");
+            const response = await axios.get("customer/get-all-customers");
+            setCustomerList(response.data.data);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const searchBtn = async () => {
+        try {
+            const response = await axios.get("customer/load-all-customers");
             setCustomerList(response.data);
         } catch (error) {
             console.log(error);
         }
     }
-    //
-    // const searchBtn = async ()=>{
-    //     try {
-    //         const response = await axios.get("/load-all-customers");
-    //         setCustomerList(response.data);
-    //     } catch (error) {
-    //         console.log(error);
-    //     }
-    // }
 
     const handleSubmit = () => {
         let responseBody = {
-            customer_code: customerCode,
+            customer_code: code,
             company_name: companyName,
-            reference_no: referenceNumber,
+            reference_no: refNo,
             customer_type: customerType,
-            customer_name: customerName,
-            passport: passport,
+            customer_name: name,
+            passport: nicNo,
             billing_address: billingAddress,
-            mobile_number: mobileNumber,
+            mobile_number: mobile,
             email: email,
-            country: countryTxt,
+            country: country,
             gender: gender,
             city: city,
             id: id,
@@ -106,8 +118,8 @@ function App() {
 
     const loadCountry = async () => {
         try {
-            const response = await axios.get("/load-all-countries");
-            setCountryList(response.data);
+            const response = await axios.get("https://countryapi.io/api/all?apikey=uKjkhdhLwvY6L1s9I71vgQQVVEOuFJUoZ0IssYTi");
+            setCountryArrayList(response.name);
         } catch (error) {
             console.log(error);
         }
@@ -115,8 +127,18 @@ function App() {
 
     const loadTypes = async () => {
         try {
-            const response = await axios.get("/load-all-customer-types");
-            setTypesList(response.data);
+            const response = await axios.get("customer-type-controller/get-all-customer-types");
+            setTypesList(response.data.data);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const setAutoGenaratedValue = async () => {
+        try {
+            const response = await axios.get("customer/?test=");
+            console.log(response);
+            setCode(response.data);
         } catch (error) {
             console.log(error);
         }
@@ -125,29 +147,30 @@ function App() {
     useEffect(() => {
         getAllCustomers();
         loadTypes();
-        loadCountry();
+        // loadCountry();
+        setAutoGenaratedValue();
     }, []);
 
     const columns = [
         {
             title: "Code",
-            dataIndex: "customer_code",
-            key: "customer_code",
+            dataIndex: "code",
+            key: "code",
         },
         {
-            key: "customer_type",
+            key: "customerType",
             title: "Type",
-            dataIndex: "customer_type",
+            dataIndex: "customerType",
         },
         {
-            key: "company_name",
-            title: "Name",
-            dataIndex: "company_name",
+            key: "companyName",
+            title: "Company Name",
+            dataIndex: "companyName",
         },
         {
-            key: "mobile_number",
+            key: "mobile",
             title: "Mobile",
-            dataIndex: "mobile_number",
+            dataIndex: "mobile",
         },
         {
             key: "country",
@@ -216,7 +239,7 @@ function App() {
             dataIndex: "email",
         },
         {
-            key: "8",
+            key: "5",
             title: "Actions",
             render: (record) => {
                 return (
@@ -239,25 +262,13 @@ function App() {
         },
     ];
 
-    // const onDeleteStudent = (record) => {
-    //   Modal.confirm({
-    //     title: "Are you sure, you want to delete this student record?",
-    //     okText: "Yes",
-    //     okType: "danger",
-    //     onOk: () => {
-    //       setCustomerList((pre) => {
-    //         return pre.filter((student) => student.id !== record.id);
-    //       });
-    //     },
-    //   });
-    // };
     const handleDelete = () => {
         if (window.confirm("Do you want to remove this jeep ?")) {
             axios
-                .delete(`delete-customer/C00-001`)
+                .delete(`/delete-customer-by-id/{code}`)
 
                 .then((response) => {
-                    console.log(customerCode);
+                    console.log(code);
                     const Toast = Swal.mixin({
                         toast: true,
                         position: "top-end",
@@ -320,12 +331,13 @@ function App() {
 
                 {/* //TODO Model starting ----------------------------------------------------------*/}
                 <Modal
+                    centered={true}
                     title="CUSTOMER DETAILS"
                     visible={isEditing}
                     okText="Save"
                     onCancel={resetEditing}
-                    width={900}
-                    height={800}
+                    width={1000}
+                    height={900}
                     onOk={() => {
                         handleSubmit();
                         resetEditing();
@@ -363,7 +375,7 @@ function App() {
                                         <Form.Item
                                             label="Code"
                                             name="code"
-                                            value={customerCode}
+                                            value={code}
                                             gutter={[0, 0]}
                                             rules={[
                                                 {
@@ -376,7 +388,7 @@ function App() {
                                             labelAlign="top"
                                             onChange={(e) => {
                                                 const value = e.target.value;
-                                                setCustomerCode(value);
+                                                setCode(value);
                                             }}
                                         >
                                             <Input placeholder="Type the code"/>
@@ -387,7 +399,7 @@ function App() {
                                         <Form.Item
                                             label="Reference Number"
                                             name="reference_number"
-                                            value={referenceNumber}
+                                            value={refNo}
                                             rules={[
                                                 {
                                                     required: true,
@@ -398,7 +410,7 @@ function App() {
                                             hasFeedback
                                             onChange={(e) => {
                                                 const value = e.target.value;
-                                                setReferenceNumber(value);
+                                                setRefNo(value);
                                             }}
                                         >
                                             <Input placeholder="Reference Number"/>
@@ -411,12 +423,12 @@ function App() {
                                             label="Customer Type"
                                             id="customerType"
 
-                                            rules={[
-                                                {
-                                                    required: true,
-                                                    message: "Please select the customer type",
-                                                },
-                                            ]}
+                                            // rules={[
+                                            //     {
+                                            //         required: true,
+                                            //         message: "Please select the customer type",
+                                            //     },
+                                            // ]}
                                             hasFeedback
                                             onChange={(e) => {
                                                 const customerType = e.target.value;
@@ -430,7 +442,7 @@ function App() {
                                                         key={type.type_id}
                                                         value={type.type_id}
                                                     >
-                                                        {type.type}
+                                                        {type.customerType}
                                                     </Select.Option>
                                                 ))}
                                             </Select>
@@ -441,7 +453,7 @@ function App() {
                                         <Form.Item
                                             name="customer_name"
                                             label="Customer Name"
-                                            value={customerName}
+                                            value={name}
                                             rules={[
                                                 {
                                                     required: true,
@@ -452,7 +464,7 @@ function App() {
                                             hasFeedback
                                             onChange={(e) => {
                                                 const value = e.target.value;
-                                                setCustomerName(value);
+                                                setName(value);
                                             }}
                                         >
                                             <Input placeholder="Type the customer name"/>
@@ -485,7 +497,7 @@ function App() {
                                         <Form.Item
                                             name="idType"
                                             label="NIC/Passport"
-                                            value={passport}
+                                            value={nicNo}
                                             height={100}
                                             rules={[
                                                 {
@@ -497,7 +509,7 @@ function App() {
                                             hasFeedback
                                             onChange={(e) => {
                                                 const value = e.target.value;
-                                                setPassport(value);
+                                                setNicNo(value);
                                             }}
                                         >
                                             <Input placeholder="ID Type"/>
@@ -550,7 +562,7 @@ function App() {
                                     <Form.Item
                                         name="mobile_number"
                                         label="Mobile Number"
-                                        value={mobileNumber}
+                                        value={mobile}
                                         rules={[
                                             {
                                                 required: true,
@@ -561,7 +573,7 @@ function App() {
                                         hasFeedback
                                         onChange={(e) => {
                                             const value = e.target.value;
-                                            setMobileNumber(value);
+                                            setMobile(value);
                                         }}
                                     >
                                         <Input placeholder="Type the customer name"/>
@@ -598,7 +610,7 @@ function App() {
                                     <Form.Item
                                         name="country_code"
                                         label="Country Code"
-                                        value={countryTxt}
+                                        value={country}
                                         id="countryCode"
                                         onChange={(e) => {
                                             const value = e.target.value;
@@ -615,10 +627,10 @@ function App() {
                                         <Select placeholder="Select country code">
                                             {country.map((type) => (
                                                 <Select.Option
-                                                    key={type.country_code}
-                                                    value={type.country_code}
+                                                    key={type.name}
+                                                    value={type.name}
                                                 >
-                                                    {type.country}
+                                                    {type.ad}
                                                 </Select.Option>
                                             ))}
                                         </Select>
@@ -689,7 +701,7 @@ function App() {
                                     <Form.Item
                                         label="Name"
                                         name="name"
-                                        value={customerName}
+                                        value={name}
                                         gutter={[0, 0]}
                                         rules={[
                                             {
@@ -701,7 +713,7 @@ function App() {
                                         hasFeedback
                                         onChange={(e) => {
                                             const value = e.target.value;
-                                            setCustomerName(value);
+                                            setName(value);
                                         }}
                                         labelAlign="top"
                                     >
@@ -713,7 +725,7 @@ function App() {
                                     <Form.Item
                                         label="Designation"
                                         name="designation"
-                                        // value={}
+                                        value={designation}
                                         gutter={[0, 0]}
                                         rules={[
                                             {
@@ -722,10 +734,10 @@ function App() {
                                             },
                                             {whitespace: false},
                                         ]}
-                                        // hasFeedbackonChange={(e) => {
-                                        //   const value = e.target.value;
-                                        //   (value);
-                                        // }}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            setDesignation(value);
+                                        }}
                                         labelAlign="top"
                                     >
                                         <Input placeholder="Type the code"/>
@@ -736,7 +748,7 @@ function App() {
                                     <Form.Item
                                         label="Mobile"
                                         name="mobile"
-                                        value={mobileNumber}
+                                        value={mobile}
                                         gutter={[0, 0]}
                                         rules={[
                                             {
@@ -748,7 +760,7 @@ function App() {
                                         hasFeedback
                                         onChange={(e) => {
                                             const value = e.target.value;
-                                            setMobileNumber(value);
+                                            setMobile(value);
                                         }}
                                         labelAlign="top"
                                     >
@@ -779,22 +791,26 @@ function App() {
                                         <Input placeholder="Type the code"/>
                                     </Form.Item>
                                 </Col>
-                                <Button type="primary">Add</Button>
+                                <Button onClick={handleAddCustomer}>Add Customer</Button>
+
                                 <Row
                                     gutter={[24, 0]}
                                     justify="center"
                                     align="middle"
                                     style={{marginTop: -20}}
                                 >
-                                    <Col>
-                                        <Table
-                                            columns={columns2}
-                                            pagination={true}
-                                            // dataSource={dataSource}
-                                            style={{width: "100%"}}
-                                        ></Table>
-                                    </Col>
+                                    {/*<Col>*/}
+
+                                    <Table
+                                        columns={columns2}
+                                        id="table"
+                                        pagination={true}
+                                        dataSource={customerDetails}
+                                    />
+
+                                    {/*</Col>*/}
                                 </Row>
+
                             </Row>
                         </Row>
                     </Form>
