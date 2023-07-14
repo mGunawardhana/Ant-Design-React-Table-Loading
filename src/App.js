@@ -100,7 +100,7 @@ function App() {
             id:"",
             code:code,
             refNo:refNo,
-            customerType:customerType,
+            customerType:$("#customerType").val(),
             name:name,
             companyName:companyName,
             nicNo:nicNo,
@@ -129,8 +129,9 @@ function App() {
 
     const loadCountry = async () => {
         try {
-            const response = await axios.get("https://countryapi.io/api/all?apikey=uKjkhdhLwvY6L1s9I71vgQQVVEOuFJUoZ0IssYTi");
-            setCountryArrayList(response.name);
+            const response = await axios.get("customer-country-controller/get-all-country-types");
+            setCountryArrayList(response.data.data);
+            console.log(response.data.data);
         } catch (error) {
             console.log(error);
         }
@@ -181,7 +182,7 @@ const setAutoGenaratedValue = async () => {
     useEffect(() => {
         getAllCustomers();
         loadTypes();
-        // loadCountry();
+        loadCountry();
         setAutoGenaratedValue();
     }, []);
 
@@ -443,31 +444,26 @@ const setAutoGenaratedValue = async () => {
                                             name="customer_type"
                                             label="Customer Type"
                                             id="customerType"
-
-                                            // rules={[
-                                            //     {
-                                            //         required: true,
-                                            //         message: "Please select the customer type",
-                                            //     },
-                                            // ]}
                                             hasFeedback
-                                            onChange={(e) => {
-                                                const customerType = e.target.value;
-                                                setCustomerType(customerType);
-                                            }}
                                             value={customerType}
+                                            onChange={(e) => {
+                                                const value = e.target.value;
+                                                setCustomerType(value);
+                                            }}
                                         >
                                             <Select placeholder="Select customer type">
                                                 {types.map((type) => (
                                                     <Select.Option
                                                         key={type.type_id}
                                                         value={type.type_id}
+                                                        selected={type.type_id === customerType}
                                                     >
                                                         {type.customerType}
                                                     </Select.Option>
                                                 ))}
                                             </Select>
                                         </Form.Item>
+
                                     </Col>
                                     <Col span={8} style={{marginTop: -20, marginBottom: -20}}>
                                         {/*<label>Customer Name: *</label>*/}
@@ -514,7 +510,6 @@ const setAutoGenaratedValue = async () => {
                                         </Form.Item>
                                     </Col>
                                     <Col span={8} style={{marginTop: -20, marginBottom: -20}}>
-                                        {/*<label>NIC/Passport/Driver's Licence: *</label>*/}
                                         <Form.Item
                                             name="idType"
                                             label="NIC/Passport"
@@ -637,21 +632,16 @@ const setAutoGenaratedValue = async () => {
                                             const value = e.target.value;
                                             setCountry(value);
                                         }}
-                                        // rules={[
-                                        //   {
-                                        //     required: true,
-                                        //     message: "Please select the customer type",
-                                        //   },
-                                        // ]}
                                         hasFeedback
                                     >
-                                        <Select placeholder="Select country code">
-                                            {country.map((type) => (
+
+                                        <Select placeholder="country code">
+                                            {countryArray.map((type) => (
                                                 <Select.Option
-                                                    key={type.name}
-                                                    value={type.name}
+                                                    key={type.id}
+                                                    value={type.id}
                                                 >
-                                                    {type.ad}
+                                                    {type.countryName}
                                                 </Select.Option>
                                             ))}
                                         </Select>
