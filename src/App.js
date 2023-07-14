@@ -12,6 +12,7 @@ import {
 } from "@ant-design/icons";
 import axios from "./axios";
 import Swal from "sweetalert2";
+import $ from "jquery";
 
 const {TextArea} = Input;
 
@@ -27,14 +28,14 @@ function App() {
 
     //hooks for text fields
     const [customerId, setCustomerId] = useState(0);
-    const [code, setCode] = useState("");
+    const [code, setCode] = useState('');
     const [companyName, setCompanyName] = useState("");
     const [refNo, setRefNo] = useState("");
     const [customerType, setCustomerType] = useState("");
     const [name, setName] = useState("");
     const [nicNo, setNicNo] = useState("");
     const [billingAddress, setBillinAddress] = useState("");
-    const [mobile, setMobile] = useState("");
+    const [mobileNumber, setMobileNumber] = useState("");
     const [email, setEmail] = useState("");
     const [country, setCountry] = useState([]);
     const [gender, setGender] = useState("");
@@ -45,6 +46,7 @@ function App() {
 
     const [searchField, setSearchField] = useState("");
     const [searchValue, searchValueChange] = useState();
+
 
     /** array for storing customer details */
     // let customerDetails = [];
@@ -58,22 +60,27 @@ function App() {
         }
     }
 
-    const [customerDetails, setCustomerDetails] = useState([]);
+    let [customerDetails, setCustomerDetails] = useState([]);
 
     const handleAddCustomer = () => {
         let customer = new ContactPersonDetail(
             name,
             designation,
-            mobile,
+            mobileNumber,
             email
         );
         setCustomerDetails([...customerDetails, customer]);
+    };
+
+    const handleDeleteCustomer = (id) => {
+        setCustomerDetails(customerDetails.filter((customer) => customer.id !== id));
     };
 
     const getAllCustomers = async () => {
         try {
             const response = await axios.get("customer/get-all-customers");
             setCustomerList(response.data.data);
+            setAutoGenaratedValue();
         } catch (error) {
             console.log(error);
         }
@@ -89,29 +96,33 @@ function App() {
     }
 
     const handleSubmit = () => {
-        let responseBody = {
-            customer_code: code,
-            company_name: companyName,
-            reference_no: refNo,
-            customer_type: customerType,
-            customer_name: name,
-            passport: nicNo,
-            billing_address: billingAddress,
-            mobile_number: mobile,
-            email: email,
-            country: country,
-            gender: gender,
-            city: city,
-            id: id,
-        };
+        let requestBody = {
+            id:"",
+            code:code,
+            refNo:refNo,
+            customerType:customerType,
+            name:name,
+            companyName:companyName,
+            nicNo:nicNo,
+            billingAddress:billingAddress,
+            mobile:mobileNumber,
+            email:email,
+            country:"country",
+            city:city,
+            gender:gender,
+            contactPersonDetails:customerDetails
+        }
+
+        console.log(requestBody);
 
         axios
-            .post("/save-customer", JSON.stringify(responseBody))
+            .post("customer/save-customer",JSON.stringify(requestBody))
             .then((res) => {
-                alert("submit!");
+                console.log(res.data);
+                // alert("submit!");
             })
             .catch((e) => {
-                alert("error!");
+                // alert("error!");
                 console.log(e);
             });
     };
@@ -134,15 +145,38 @@ function App() {
         }
     };
 
-    const setAutoGenaratedValue = async () => {
-        try {
-            const response = await axios.get("customer/?test=");
-            console.log(response);
-            setCode(response.data);
-        } catch (error) {
-            console.log(error);
-        }
+
+const setAutoGenaratedValue = async () => {
+  try {
+    const response = await axios.get("customer?test=");
+    console.log(response.data.data);
+    let value = response.data.data;
+    setCode(response.data.data);
+    // document.getElementById("code").value = value;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+    const initialValues = {
+        code: code,
     };
+
+    function deleteCustomer(id) {
+        // Get the customer from the list of customers.
+        const customer = customerDetails.find((customer) => customer.id === id);
+
+        // Check if the customer is found.
+        if (customer !== undefined) {
+            // Remove the customer from the list of customers.
+            const newCustomerDetails = customerDetails.filter((customer) => customer.id !== id);
+
+            // Update the state of the component.
+            setCustomerDetails(newCustomerDetails);
+        }
+    }
+
+
 
     useEffect(() => {
         getAllCustomers();
@@ -206,9 +240,7 @@ function App() {
                             style={{marginLeft: 12}}
                         />
                         <DeleteOutlined
-                            onClick={() => {
-                                handleDelete();
-                            }}
+                            onClick={() => deleteCustomer(record.id)}
                             style={{color: "red", marginLeft: 12}}
                         />
                     </>
@@ -251,8 +283,8 @@ function App() {
                             style={{marginLeft: 12}}
                         />
                         <DeleteOutlined
-                            onClick={() => {
-                                // onDeleteStudent(record);
+                            onClick={(e) => {
+                                handleDeleteCustomer();
                             }}
                             style={{color: "red", marginLeft: 12}}
                         />
@@ -304,10 +336,12 @@ function App() {
         setEditingStudent(null);
     };
 
+
+
+
     return (
         <div className="App">
             <header className="App-header" style={{color: "#fff"}}>
-                {/* <Button onClick={onAddStudent}>Add a new Student</Button> */}
                 <div style={{display: "flex", marginBottom: 3}}>
                     {/*//TODO search here */}
                     <Input
@@ -337,7 +371,6 @@ function App() {
                     okText="Save"
                     onCancel={resetEditing}
                     width={1000}
-                    height={900}
                     onOk={() => {
                         handleSubmit();
                         resetEditing();
@@ -353,14 +386,11 @@ function App() {
                         name="validateOnly"
                         layout="vertical"
                         autoComplete="off"
+                        style={{ flex: 8 }}
                         onFinishFailed={(error) => {
                             console.log({error});
                         }}
-                        style={{
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center",
-                        }}
+                        initialValues={initialValues}
                     >
                         <Row gutter={[24, 16]} justify="center" align="middle">
                             <Col span={16}>
@@ -373,25 +403,16 @@ function App() {
                                     <Col span={8}>
                                         {/*<label>Code:*</label>*/}
                                         <Form.Item
+                                            id="code"
                                             label="Code"
                                             name="code"
                                             value={code}
+                                            //TODO set code here
                                             gutter={[0, 0]}
-                                            rules={[
-                                                {
-                                                    required: true,
-                                                    message: "Please enter the code",
-                                                },
-                                                {whitespace: false},
-                                            ]}
                                             hasFeedback
                                             labelAlign="top"
-                                            onChange={(e) => {
-                                                const value = e.target.value;
-                                                setCode(value);
-                                            }}
                                         >
-                                            <Input placeholder="Type the code"/>
+                                            <Input placeholder=""/>
                                         </Form.Item>
                                     </Col>
                                     <Col span={8}>
@@ -562,7 +583,7 @@ function App() {
                                     <Form.Item
                                         name="mobile_number"
                                         label="Mobile Number"
-                                        value={mobile}
+                                        value={mobileNumber}
                                         rules={[
                                             {
                                                 required: true,
@@ -573,7 +594,7 @@ function App() {
                                         hasFeedback
                                         onChange={(e) => {
                                             const value = e.target.value;
-                                            setMobile(value);
+                                            setMobileNumber(value);
                                         }}
                                     >
                                         <Input placeholder="Type the customer name"/>
@@ -748,7 +769,7 @@ function App() {
                                     <Form.Item
                                         label="Mobile"
                                         name="mobile"
-                                        value={mobile}
+                                        value={mobileNumber}
                                         gutter={[0, 0]}
                                         rules={[
                                             {
@@ -760,7 +781,7 @@ function App() {
                                         hasFeedback
                                         onChange={(e) => {
                                             const value = e.target.value;
-                                            setMobile(value);
+                                            setMobileNumber(value);
                                         }}
                                         labelAlign="top"
                                     >
@@ -806,6 +827,9 @@ function App() {
                                         id="table"
                                         pagination={true}
                                         dataSource={customerDetails}
+                                        onRowDelete={deleteCustomer}
+
+
                                     />
 
                                     {/*</Col>*/}
